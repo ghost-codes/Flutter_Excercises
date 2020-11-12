@@ -24,6 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     pageController = PageController();
     // Firebase.initializeApp();
+    //logout();
     googleLoggedIncheck().then((result) {
       print(result);
       setState(() {
@@ -42,14 +43,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   login() async {
     //final _authResult = await googleSignIn.signIn();
-    signInWithGoogle().then((result) {
-      this.user = result;
-      setState(() => isAuth = result != null);
-    });
+    User result = await signInWithGoogle();
+    this.user = result;
+    await createUserInFireStore(context, user);
+
+    setState(() => isAuth = result != null);
   }
 
   logout() {
-    googleSignIn.signOut();
+    signOutGoogle();
     setState(() => isAuth = false);
   }
 
@@ -74,11 +76,15 @@ class _HomeScreenState extends State<HomeScreen> {
         onPageChanged: onPageChanged,
         physics: NeverScrollableScrollPhysics(),
         children: [
+          //     RaisedButton(
+          //   onPressed: ()=>logout(),
+          //   child: Text('Logout'),
+          // ),
           Timeline(),
           ActivityFeed(),
-          Upload(),
+          Upload(currentUser: currentUser,),
           Search(),
-          Profile(),
+          Profile(profileId: currentUser?.id,),
         ],
       ),
       bottomNavigationBar: CupertinoTabBar(
@@ -128,13 +134,6 @@ class _HomeScreenState extends State<HomeScreen> {
             GestureDetector(
               onTap: () {
                 login();
-                // signInWithGoogle().then((result){
-                //   if(result!=null){
-                //     setState(() {
-                //       isAuth = true;
-                //     });
-                //   }
-                // });
               },
               child: Container(
                 width: 260.00,

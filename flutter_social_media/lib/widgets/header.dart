@@ -2,8 +2,9 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-AppBar header(BuildContext context, {bool isAppTitle, String title}) {
+AppBar header(BuildContext context, {bool isAppTitle= false, String title,bool removebackButton= false}) {
   return AppBar(
+    automaticallyImplyLeading: !removebackButton,
     title: (isAppTitle)
         ? Text(
             "Social Media",
